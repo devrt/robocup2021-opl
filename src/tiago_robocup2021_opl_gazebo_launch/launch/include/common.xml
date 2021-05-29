@@ -49,7 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
   <arg name="laser_model"  default="sick-571"/>
   <arg name="camera_model"  default="orbbec-astra"/>
  
-  <arg name="map" default="$(find tmc_wrs_gazebo_worlds)/maps/wrs2020/map.yaml" />
+  <arg name="map_file" default="$(find tmc_wrs_gazebo_worlds)/maps/wrs2020/map.yaml" />
 
   <arg unless="$(arg fast_physics)" name="world_suffix" value=""/>
   <arg     if="$(arg fast_physics)" name="world_suffix" value="_fast"/>
@@ -92,6 +92,21 @@ POSSIBILITY OF SUCH DAMAGE.
     <arg name="public_sim"  value="false"/>
     <arg name="use_moveit_camera" value="false"/>
     <arg name="use_dynamic_footprint" value="false"/>
+  </include>
+
+  <!-- navigation -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <include file="$(find tiago_2dnav)/launch/localization.launch">
+  </include>
+
+  <node pkg="topic_tools" type="relay" name="relay_scan" args="/scan_raw /scan" />
+  <node pkg="topic_tools" type="relay" name="relay_rgbd_scan" args="/scan_raw /rgbd_scan" />
+
+  <include file="$(find tiago_2dnav)/launch/move_base.launch">
+    <arg name="public_sim"  value="true"/>
+    <arg name="local_planner" value="teb"/>
+    <arg name="rgbd_sensors" value="false"/>
   </include>
 
   <!-- spawn objects to the world -->

@@ -40,6 +40,8 @@ RUN cd /robocup_ws && source /opt/ros/$ROS_DISTRO/setup.bash && catkin_make inst
 
 RUN source /opt/ros/$ROS_DISTRO/setup.bash && rosrun tmc_gazebo_task_evaluators setup_score_widget
 
+RUN mkdir -p /root/.pal && touch /root/.pal/pose.yaml
+
 ADD entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 
