@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>tiago_robocup2021_opl_gazebo_launch</name>
+  <version>1.0.0</version>
+  <description>Launch files for RoboCup2021 OPL simulator for TIAGo</description>
+  <maintainer email="yosuke.matsusaka@gmail.com">Yosuke Matsusaka</maintainer>
+
+  <license>BSD 3-clause Clear License</license>
+
+  <author>Yosuke Matsusaka</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>roscpp</exec_depend>
+  <test_depend>roslaunch</test_depend>
+  <exec_depend>tmc_gazebo_task_evaluators</exec_depend>
+  <exec_depend>tmc_wrs_gazebo_worlds</exec_depend>
+
+  <test_depend>roslaunch</test_depend>
+
+  <export/>
+</package>

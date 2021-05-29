@@ -1,0 +1,6 @@
+[submodule "src/tmc_gazebo_task_evaluators"]
+	path = src/tmc_gazebo_task_evaluators
+	url = https://github.com/hsr-project/tmc_gazebo_task_evaluators.git
+[submodule "src/tmc_wrs_gazebo"]
+	path = src/tmc_wrs_gazebo
+	url = https://github.com/hsr-project/tmc_wrs_gazebo.git

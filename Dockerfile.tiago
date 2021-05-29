@@ -1,0 +1,63 @@
+# Copyright (c) 2021 MID Academic Promotions, Inc.
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+
+#  * Redistributions of source code must retain the above copyright notice,
+#  this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright
+#  notice, this list of conditions and the following disclaimer in the
+#  documentation and/or other materials provided with the distribution.
+#  * Neither the name of Toyota Motor Corporation nor the names of its
+#  contributors may be used to endorse or promote products derived from
+#  this software without specific prior written permission.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+FROM palroboticssl/tiago_tutorials:melodic
+
+SHELL ["/bin/bash", "-c"]
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN mkdir /robocup_ws
+ADD src /robocup_ws/src
+RUN cd /robocup_ws/src && source /opt/ros/$ROS_DISTRO/setup.bash && catkin_init_workspace || true
+RUN cd /robocup_ws && rosinstall src /opt/ros/melodic https://raw.githubusercontent.com/pal-robotics/tiago_tutorials/kinetic-devel/tiago_public-melodic.rosinstall
+RUN cd /robocup_ws && source /opt/ros/$ROS_DISTRO/setup.bash && rosdep update && rosdep install --from-paths src --ignore-src -r -y
+RUN cd /robocup_ws && source /opt/ros/$ROS_DISTRO/setup.bash && catkin_make install -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/ros/$ROS_DISTRO -DCATKIN_ENABLE_TESTING=0
+
+RUN source /opt/ros/$ROS_DISTRO/setup.bash && rosrun tmc_gazebo_task_evaluators setup_score_widget
+
+ADD entrypoint.sh /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+RUN apt-get update && apt-get install -y python-wheel && pip install -U --ignore-installed pyassimp supervisor supervisor_twiddler
+
+ADD supervisord.conf.tiago /etc/supervisor/supervisord.conf
+
+VOLUME [ \
+    "/opt/ros/melodic/share/tiago_description", \
+    "/opt/ros/melodic/share/pmb2_description", \
+    "/opt/ros/melodic/share/pal_gripper_description", \
+    "/opt/ros/melodic/share/pal_wsg_gripper_description", \
+    "/opt/ros/melodic/share/tmc_wrs_gazebo_worlds", \
+    "/opt/ros/melodic/share/gazebo_ros", \
+    "/opt/ros/melodic/lib/gazebo_ros", \
+    "/opt/ros/melodic/lib/python2.7/dist-packages/gazebo_ros", \
+    "/opt/ros/melodic/lib/python2.7/dist-packages/gazebo_msgs" \
+    ]
+
+CMD ["/usr/local/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
+
