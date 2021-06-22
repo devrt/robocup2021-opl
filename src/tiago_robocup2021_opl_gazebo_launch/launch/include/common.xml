@@ -116,5 +116,6 @@ POSSIBILITY OF SUCH DAMAGE.
   <include file="$(find tmc_gazebo_task_evaluators)/launch/robocup2021.launch">
     <arg name="robot_name" value="$(arg robot_name)"/>
     <arg name="camera_controller" value="$(arg camera_controller)"/>
+    <arg name="seed" value="$(arg seed)"/>
   </include>
 </launch>
